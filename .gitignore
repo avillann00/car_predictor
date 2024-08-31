@@ -1,0 +1,84 @@
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+db.sqlite3  # If you ever use SQLite for development
+*.sqlite3
+*.db
+
+# Environment variables
+.env
+.env.*
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Static and media files (if collected locally)
+staticfiles/
+media/
+
+# Local settings
+local_settings.py
+
+# Secret key and other sensitive information
+*.pem
+
+# Neovim swap files
+*.swp
+*.swo
+*~
+
+# MacOS specific
+.DS_Store
+
+# Coverage reports
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Test coverage and pytest
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage/
+
+# pipenv
+Pipfile.lock
+
+# Database dumps
+*.sql
+*.dump
+*.pgsql
+
+# PostgreSQL specific
+pgdata/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Matplotlib and Seaborn cache files
+.matplotlib/
+.seaborn/
+
+# Build files (if applicable)
+build/
+dist/
+*.egg-info/
+
