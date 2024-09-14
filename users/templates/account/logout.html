@@ -1,0 +1,13 @@
+{% extends 'viz/base.html' %}
+
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+  <div class="container text-center">
+    <h2>You have been logged out.</h2>
+    <p>Thank you for visiting. We hope to see you again soon!</p>
+    <a href="{% url 'account_login' %}" class="btn btn-primary">Login Again</a> or
+    <a href="{% url 'landing' %}" class="btn btn-secondary">Go to Landing Page</a>
+  </div>
+{% endblock %}
+

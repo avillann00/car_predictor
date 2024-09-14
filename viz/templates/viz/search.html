@@ -1,0 +1,12 @@
+{% extends 'viz/base.html' %}
+
+{% block title %}Search for Car Prices{% endblock %}
+
+{% block content %}
+    <h2>Search for Car Prices</h2>
+    <form method="get" action="{% url 'search' %}">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+{% endblock %}
+

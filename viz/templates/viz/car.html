@@ -1,0 +1,16 @@
+{% extends 'viz/base.html' %}
+
+{% block title %} {% endblock %}
+
+{% block content %}
+<h2>Prediction Results</h2>
+<h6>Please keep in mind that the model being used is not 100% accurate, so treat the prediction as an estimate or something to go off of.</h6>
+<h6>Also keep in mind that I am working with a very limited and maybe outdated dataset so not every car may be available and every car price may not be what it's worth today.</h6>
+{% if prediction %}
+    <p>Predicted Value: ${{ prediction }}</p>
+{% else %}
+    <p>No prediction available.</p>
+{% endif %}
+<a href="{% url 'search' %}" class="btn btn-primary">Back to Search</a>
+{% endblock %}
+
