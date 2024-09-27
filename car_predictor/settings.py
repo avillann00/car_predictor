@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'users.apps.UsersConfig',
-    'viz.apps.VizConfig',
+    'cars.apps.CarsConfig',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

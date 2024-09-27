@@ -1,4 +1,5 @@
 # import required modules
+from operator import index
 import numpy as np
 from sqlalchemy import create_engine
 import pandas as pd
@@ -11,6 +12,83 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 from joblib import dump
+import requests
+
+def get_averages(make, model, year):
+    df = get_listings(make, model, year)
+    
+    if df.empty:
+        return None
+
+    numerical_cols = ['price', 'mileage', 'dom', 'dom_180']
+
+    averages = df[numerical_cols].mean()
+
+    return averages
+
+def get_listings(make, model, year, host='localhost', port=5432):
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
+
+    table_name = os.environ.get('LISTINGS_TABLE')
+    db_name = os.environ.get('DB_NAME')
+    user = os.environ.get('DB_USER')
+    password = os.environ.get('DB_PASSWORD')
+
+    engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db_name}')
+
+    query = f"SELECT * FROM {table_name} WHERE make = '{make}' AND model = '{model}' AND year = {year};"
+    df = pd.read_sql(query, engine)
+
+    if df.empty:
+        listings_to_sql(make, model, year)
+        df = pd.read_sql(query, engine)
+    
+    return df
+
+def listings_to_sql(make, model, year, host='localhost', port=5432):
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
+
+    API_KEY = os.environ.get('MARKETCHECK_API_KEY')
+    API_URL = f'https://mc-api.marketcheck.com/v2/search/car/active?api_key={API_KEY}&year={year}&make={make}&model={model}&include_relevant_links=true'
+
+    response = requests.get(API_URL)
+
+    if response.status_code == 200:
+        table_name = str(os.environ.get('LISTINGS_TABLE'))
+        db_name = os.environ.get('DB_NAME')
+        user = os.environ.get('DB_USER')
+        password = os.environ.get('DB_PASSWORD')
+
+        engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db_name}')
+
+        data = response.json()
+
+        info = []
+
+        listings = data.get('listings', [])
+        for i, listing in enumerate(listings):
+            price = listing.get('price')
+            mileage = listing.get('miles')
+            dom = listing.get('dom')
+            dom_180 = listing.get('dom_180')
+
+            info.append({
+                'make': make,
+                'model': model,
+                'year': year,
+                'price': price,
+                'mileage': mileage,
+                'dom': dom,
+                'dom_180': dom_180
+            })
+
+        df = pd.DataFrame(info)
+
+        df.to_sql(table_name, engine, if_exists='append', index=False)
 
 # put cleaned data into the postgresql database
 def to_sql(host='localhost', port=5432):
@@ -28,7 +106,7 @@ def to_sql(host='localhost', port=5432):
     if dfs is not None:
         engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db_name}')
         for df in dfs:
-            df = df.apply(lambda x: x.str.lower() if x.dtype == "object" else x)
+            df = df.apply(lambda x: x.str.lower() if x.dtype == 'object' else x)
             df = df.drop_duplicates()
             df.to_sql(table_name, engine, if_exists='append', index=False)
 

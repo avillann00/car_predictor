@@ -1,4 +1,4 @@
-{% extends 'viz/base.html' %}
+{% extends 'cars/base.html' %}
 
 {% block title %} {% endblock %}
 
@@ -11,6 +11,15 @@
 {% else %}
     <p>No prediction available.</p>
 {% endif %}
+<h2>Averages</h2>
+<h6>The results below are from the Marketcheck api.</h6>
+<h6>Keep in mind this is just another resource and this is the averages for the given make, model, and year on the market right now.</h6>
+<ul>
+    <li>Average Price: {{ avg_price|default:"Info not available" }}</li>
+    <li>Average Mileage: {{ avg_mileage|default:"Info not available" }}</li>
+    <li>Average Days on Market (DOM): {{ avg_dom|default:"Info not available" }}</li>
+    <li>Average Days on Market (180 Days): {{ avg_dom_180|default:"Info not available" }}</li>
+</ul>
+
 <a href="{% url 'search' %}" class="btn btn-primary">Back to Search</a>
 {% endblock %}
-
