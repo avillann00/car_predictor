@@ -1,6 +1,7 @@
 # import required modules
 from operator import index
 import numpy as np
+from numpy.random import f
 from sqlalchemy import create_engine
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
@@ -16,20 +17,24 @@ import requests
 
 def get_averages(make, model, year):
     df = get_listings(make, model, year)
-    
+
     if df.empty:
         return None
 
     numerical_cols = ['price', 'mileage', 'dom', 'dom_180']
 
     averages = df[numerical_cols].mean()
-
+    
     return averages
 
 def get_listings(make, model, year, host='localhost', port=5432):
     ENV_FILE = find_dotenv()
     if ENV_FILE:
         load_dotenv(ENV_FILE)
+
+    make = make.strip()
+    model = model.strip()
+    year = int(year)
 
     table_name = os.environ.get('LISTINGS_TABLE')
     db_name = os.environ.get('DB_NAME')
@@ -38,13 +43,15 @@ def get_listings(make, model, year, host='localhost', port=5432):
 
     engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db_name}')
 
+    print(f"Table Name: {table_name}, Make: {make}, Model: {model}, Year: {year}")
+
     query = f"SELECT * FROM {table_name} WHERE make = '{make}' AND model = '{model}' AND year = {year};"
     df = pd.read_sql(query, engine)
 
     if df.empty:
         listings_to_sql(make, model, year)
-        df = pd.read_sql(query, engine)
-    
+        df = pd.read_sql(f"SELECT * FROM {table_name} WHERE make = '{make}' AND model = '{model}' AND year = {year};", engine)
+
     return df
 
 def listings_to_sql(make, model, year, host='localhost', port=5432):
@@ -96,7 +103,7 @@ def to_sql(host='localhost', port=5432):
     if ENV_FILE:
         load_dotenv(ENV_FILE)
 
-    table_name = str(os.environ.get('DB_TABLE'))
+    table_name = str(os.environ.get('CAR_DB_TABLE'))
     db_name = os.environ.get('DB_NAME')
     user = os.environ.get('DB_USER')
     password = os.environ.get('DB_PASSWORD')
@@ -116,7 +123,7 @@ def to_pd(host='localhost', port=5432):
     if ENV_FILE:
         load_dotenv(ENV_FILE)
 
-    table_name = os.environ.get('DB_TABLE')
+    table_name = os.environ.get('CAR_DB_TABLE')
     db_name = os.environ.get('DB_NAME')
     user = os.environ.get('DB_USER')
     password = os.environ.get('DB_PASSWORD')
@@ -161,10 +168,10 @@ def clean():
     ENV_FILE = find_dotenv()
     if ENV_FILE:
         load_dotenv(ENV_FILE)
-    path1 = str(os.environ.get('PATH1'))
-    path2 = str(os.environ.get('PATH2'))
-    path3 = str(os.environ.get('PATH3'))
-    path4 = str(os.environ.get('PATH4'))
+    path1 = str(os.environ.get('DATA_PATH1'))
+    path2 = str(os.environ.get('DATA_PATH2'))
+    path3 = str(os.environ.get('DATA_PATH3'))
+    path4 = str(os.environ.get('DATA_PATH4'))
 
     df1 = pd.read_csv(path1)
     df2 = pd.read_csv(path2)
@@ -229,7 +236,7 @@ def uniques(host='localhost', port=5432):
     if ENV_FILE:
         load_dotenv(ENV_FILE)
 
-    table_name = os.environ.get('DB_TABLE')
+    table_name = os.environ.get('CAR_DB_TABLE')
     db_name = os.environ.get('DB_NAME')
     user = os.environ.get('DB_USER')
     password = os.environ.get('DB_PASSWORD')
@@ -243,6 +250,9 @@ def uniques(host='localhost', port=5432):
     df = df.applymap(lambda x: x.lower() if isinstance(x, str) else x)
 
     df_no_outliers = df[(df['price'] > 0) & (df['price'] < 20000)]
+
+    df_no_outliers.loc[df_no_outliers['model'] == 'alitma', 'model'] = 'altima'
+
 
     unique = []
 
@@ -258,7 +268,7 @@ def verify(make, model, year, host='localhost', port=5432):
     if ENV_FILE:
         load_dotenv(ENV_FILE)
 
-    table_name = os.environ.get('DB_TABLE')
+    table_name = os.environ.get('CAR_DB_TABLE')
     db_name = os.environ.get('DB_NAME')
     user = os.environ.get('DB_USER')
     password = os.environ.get('DB_PASSWORD')

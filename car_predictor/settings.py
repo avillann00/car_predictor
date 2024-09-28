@@ -20,16 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
 
 # Application definition
 
@@ -157,9 +157,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'APP': {
-            'client_id':  os.environ.get('AUTH0_CLIENT_ID'),
-            'secret': os.environ.get('AUTH0_CLIENT_SECRET'),
+        'APP': {        
+            'client_id':  os.environ.get('GOOGLE_AUTH0_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_AUTH0_CLIENT_SECRET'),
             'key': ''
         }
     },
