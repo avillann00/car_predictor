@@ -32,8 +32,11 @@ def search(request):
             if valid:
                 prediction = ml_models.models.perform_prediction_gb(make, model, year)
                 averages = ml_models.process.get_averages(make, model, year)
-                
-                return redirect(reverse('car') + f"?prediction={prediction}&price={averages['price']}&mileage={averages['mileage']}&dom={averages['dom']}&dom_180={averages['dom_180']}")
+
+                if averages is not None:
+                    return redirect(reverse('car') + f"?prediction={prediction}&price={averages['price']}&mileage={averages['mileage']}&dom={averages['dom']}&dom_180={averages['dom_180']}")
+                else:
+                    return redirect(reverse('car') + f"?prediction={prediction}")
 
             else:
                 messages.error(request, 'Incorrect make, model, or year selected.')       

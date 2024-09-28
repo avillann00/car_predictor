@@ -6,7 +6,3 @@ urlpatterns = [
     path('logout/', logout.as_view(), name='logout'),
     path('register/', register.as_view(), name='register'),
 ]
-
-
-
-
